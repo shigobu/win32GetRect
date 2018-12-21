@@ -16,6 +16,12 @@ namespace win32GetRect
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
+		[System.Runtime.InteropServices.DllImport("user32.dll")]
+		public static extern int SendMessage(IntPtr hWnd, uint Msg, uint wParam, int lParam);
+
+		private const uint WM_LBUTTONDOWN = 0x0201;
+		private const uint WM_LBUTTONUP = 0x0202;
+
 		static void Main(string[] args)
 		{
 			Console.WriteLine("プロセス名の入力");
@@ -39,12 +45,23 @@ namespace win32GetRect
 			Console.WriteLine("X {0}", rect.Right - rect.Left);
 			Console.WriteLine("Y {0}", rect.Bottom - rect.Top);
 
-			GetClientRect(handle, out rect);
+			RECT rect2;
+			GetClientRect(handle, out rect2);
 			Console.WriteLine("クライアントウサイズ");
-			Console.WriteLine("X {0}", rect.Right - rect.Left);
-			Console.WriteLine("Y {0}", rect.Bottom - rect.Top);
+			Console.WriteLine("X {0}", rect2.Right - rect2.Left);
+			Console.WriteLine("Y {0}", rect2.Bottom - rect2.Top);
+
+			SendMessage(handle, WM_LBUTTONDOWN, 0, MAKELPARAM(563,404));
+			System.Threading.Thread.Sleep(50);
+			SendMessage(handle, WM_LBUTTONUP, 0, MAKELPARAM(25, 45));
 
 			Console.Read();
+		}
+
+		private static int MAKELPARAM(int x, int y)
+		{
+			int temp = x << 16;
+			return temp + 45;
 		}
 	}
 
