@@ -17,7 +17,7 @@ namespace win32GetRect
 		static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
-		public static extern int SendMessage(IntPtr hWnd, uint Msg, uint wParam, int lParam);
+		public static extern int SendMessage(IntPtr hWnd, uint Msg, uint wParam, uint lParam);
 
 		private const uint WM_LBUTTONDOWN = 0x0201;
 		private const uint WM_LBUTTONUP = 0x0202;
@@ -51,17 +51,21 @@ namespace win32GetRect
 			Console.WriteLine("X {0}", rect2.Right - rect2.Left);
 			Console.WriteLine("Y {0}", rect2.Bottom - rect2.Top);
 
-			SendMessage(handle, WM_LBUTTONDOWN, 0, MAKELPARAM(563,404));
+			Microsoft.VisualBasic.Interaction.AppActivate(pro.Id);
+			System.Threading.Thread.Sleep(100);
+
+			SendMessage(handle, WM_LBUTTONDOWN, 0, MAKELPARAM(-25, -34));
 			System.Threading.Thread.Sleep(50);
-			SendMessage(handle, WM_LBUTTONUP, 0, MAKELPARAM(25, 45));
+			SendMessage(handle, WM_LBUTTONUP, 0, MAKELPARAM(25, 34));
 
 			Console.Read();
 		}
 
-		private static int MAKELPARAM(int x, int y)
+		private static uint MAKELPARAM(short x, short y)
 		{
-			int temp = x << 16;
-			return temp + 45;
+			int temp = x * 0x10000;
+			uint ret = (uint)temp + (ushort)y;
+			return ret;
 		}
 	}
 
