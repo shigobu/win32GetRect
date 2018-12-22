@@ -16,17 +16,29 @@ namespace win32GetRect
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
-		[System.Runtime.InteropServices.DllImport("user32.dll")]
+		[DllImport("user32.dll")]
 		public static extern int SendMessage(IntPtr hWnd, uint Msg, uint wParam, uint lParam);
 
-		private const uint WM_LBUTTONDOWN = 0x0201;
-		private const uint WM_LBUTTONUP = 0x0202;
+        [DllImport("USER32.dll", CallingConvention = CallingConvention.StdCall)]
+        static extern void SetCursorPos(int X, int Y);
 
-		static void Main(string[] args)
+        [DllImport("USER32.dll", CallingConvention = CallingConvention.StdCall)]
+        static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+
+        private const uint WM_LBUTTONDOWN = 0x0201;
+		private const uint WM_LBUTTONUP = 0x0202;
+        private const uint WM_MOUSEMOVE = 0x0200;
+
+        private const uint MK_LBUTTON = 0x0001;
+        private const uint MK_CONTROL = 0x0008;
+
+        private const int MOUSEEVENTF_LEFTDOWN = 0x2;
+        private const int MOUSEEVENTF_LEFTUP = 0x4;
+
+        static void Main(string[] args)
 		{
-			Console.WriteLine("プロセス名の入力");
-			string processName = Console.ReadLine();
-			Process[] pros = Process.GetProcessesByName(processName);
+            string processName = "dspMixFx_UR28M";
+            Process[] pros = Process.GetProcessesByName(processName);
 			Process pro = null;
 			foreach (var item in pros)
 			{
@@ -51,14 +63,21 @@ namespace win32GetRect
 			Console.WriteLine("X {0}", rect2.Right - rect2.Left);
 			Console.WriteLine("Y {0}", rect2.Bottom - rect2.Top);
 
-			Microsoft.VisualBasic.Interaction.AppActivate(pro.Id);
-			System.Threading.Thread.Sleep(100);
+            Microsoft.VisualBasic.Interaction.AppActivate(pro.Id);
+            System.Threading.Thread.Sleep(100);
 
-			SendMessage(handle, WM_LBUTTONDOWN, 0, MAKELPARAM(-25, -34));
-			System.Threading.Thread.Sleep(50);
-			SendMessage(handle, WM_LBUTTONUP, 0, MAKELPARAM(25, 34));
+            //SendMessage(handle, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(35, 200));
+            //System.Threading.Thread.Sleep(50);
+            //SendMessage(handle, WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(35, 200));
+            //System.Threading.Thread.Sleep(50);
+            //SendMessage(handle, WM_LBUTTONUP, 0, MAKELPARAM(35, 200));
 
-			Console.Read();
+            //SetCursorPos(rect.Left + 37, rect.Top + 200);
+            SetCursorPos(rect.Left + 24, rect.Top + 210);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);              // マウスの左ボタンダウンイベントを発生させる
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);                // マウスの左ボタンアップイベントを発生させる
+
+            Console.Read();
 		}
 
 		private static uint MAKELPARAM(short x, short y)
